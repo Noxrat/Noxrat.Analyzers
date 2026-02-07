@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- framework in use -->
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <!-- packaging -->
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- props -->
+    <MicrosoftCodeAnalysisVersion>$(MicrosoftCodeAnalysisVersion)</MicrosoftCodeAnalysisVersion>
+  </PropertyGroup>
+</Project>
