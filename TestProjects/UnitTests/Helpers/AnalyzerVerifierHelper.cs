@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
-namespace Noxrat.Tests;
+namespace Noxrat.Tests.Helpers;
 
 public static class AnalyzerVerifierHelper
 {

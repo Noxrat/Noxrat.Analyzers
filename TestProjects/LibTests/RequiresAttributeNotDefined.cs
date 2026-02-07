@@ -4,7 +4,7 @@ namespace Noxrat.Sandbox.Tests;
 
 public static class RequiresAttributeNotDefined
 {
-    private static void TestGenericFunction<[RequiresAttribute(typeof(TypeAttribute))] T>(
+    private static void TestGenericFunction<[RequiresAttribute(typeof(TypeeeAttribute))] T>(
         T objectToCheck
     ) { }
 
@@ -25,11 +25,35 @@ public static class RequiresAttributeNotDefined
         TestGenericFunction(obj2);
     }
 
+    private static void TestANDGenericFunction<
+        [RequiresAttribute(typeof(TypeeeAttribute))] [RequiresAttribute(typeof(Typeee2Attribute))] T
+    >(T objectToCheck) { }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Noxrat.Analyzer",
+        "Noxrat0001:Requires attribute on the type is not found",
+        Justification = "Test Reports warning successfully"
+    )]
+    private static void TestingObjectWithAttributeCallMultiAttribute()
+    {
+        SomeOtherObject obj2 = new SomeOtherObject();
+        TestANDGenericFunction(obj2);
+    }
+
+    #region Defenitions
     private class SomeObject { }
 
-    [TypeAttribute]
+    [Typeee]
     private class SomeOtherObject { }
 
+    [Typeee2]
+    [Typeee]
+    private class ObjectWithAllAttributes { }
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public class TypeAttribute : Attribute { }
+    public class TypeeeAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class Typeee2Attribute : Attribute { }
+    #endregion
 }
