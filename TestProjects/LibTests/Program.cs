@@ -1,3 +1,3 @@
-﻿namespace Noxrat.Tests;
+﻿namespace Noxrat.Sandbox.Tests;
 
 public class Program { }

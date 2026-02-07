@@ -4,9 +4,9 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
-using static Noxrat.Analyzers.CodeAnalysis.NamespaceComputer;
+using static Noxrat.Analyzers.NamespaceComputer;
 
-namespace Noxrat.Analyzers.CodeAnalysis;
+namespace Noxrat.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer

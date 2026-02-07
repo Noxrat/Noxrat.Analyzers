@@ -1,8 +1,8 @@
 namespace WrongNamespace;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
-    "NoxRaven.Sandbox",
-    "NoxRaven0000:Namespace does not match rule",
-    Justification = "Test Reports error successfully"
+    "Noxrat.Analyzer",
+    "Noxrat0000:Namespace does not match rule",
+    Justification = "Test Reports warning successfully"
 )]
 public class TestTypeWithNoNamespace { }

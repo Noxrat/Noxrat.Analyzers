@@ -2,9 +2,8 @@ using System;
 using System.Collections.Frozen;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
-using Noxrat.Analyzers.CodeAnalysis;
 
-namespace Noxrat.Analyzers.CodeAnalysis;
+namespace Noxrat.Analyzers;
 
 public static partial class DiagnosticRules
 {
@@ -21,7 +20,15 @@ public static partial class DiagnosticRules
                 EDiagnosticId.NAMESPACE_DOES_NOT_MATCH_RULE,
                 "Namespace does not match rule",
                 "File {0} does not match the root namespace rule",
-                DiagnosticSeverity.Error
+                DiagnosticSeverity.Warning
+            )
+        );
+        bakedDictionary.ExAddKV(
+            DiagnosticRulesUtils.MakeUpRule(
+                EDiagnosticId.REQUIRE_ATTRIBUTE_DOESNT_CONTAIN_ATTRIBUTE,
+                "Requires attribute on the type is not found",
+                "Type {0} does not contain required attributes: {1}",
+                DiagnosticSeverity.Warning
             )
         );
         diagnosticDescriptors = bakedDictionary.ToFrozenDictionary();

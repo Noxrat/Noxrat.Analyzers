@@ -5,11 +5,12 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace Noxrat.Analyzers.CodeAnalysis;
+namespace Noxrat.Analyzers;
 
 public static class NamespaceComputer
 {
     public const string ROOT_NAMESPACE_FQN = "Noxrat.Analyzers.RootNamespaceAttribute";
+
     public static string ComputeExpectedNamespace(
         NamespaceRule rule,
         string filePath,
@@ -79,7 +80,6 @@ public static class NamespaceComputer
                 }
             }
 
-            // fallback: just use the file's directory name (not ideal, but better than nothing)
             return fileDir;
         }
         catch
@@ -90,7 +90,6 @@ public static class NamespaceComputer
 
     private static string MakeValidNamespaceSegment(string raw)
     {
-        // Simple sanitization: turn invalid chars into '_' and ensure identifier rules
         var chars = raw.Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray();
         var candidate = new string(chars);
 
@@ -100,7 +99,6 @@ public static class NamespaceComputer
         if (!SyntaxFacts.IsIdentifierStartCharacter(candidate[0]))
             candidate = "_" + candidate;
 
-        // If still not a valid identifier, keep patching
         if (!SyntaxFacts.IsValidIdentifier(candidate))
         {
             candidate = new string(
@@ -137,7 +135,6 @@ public static class NamespaceComputer
                 if (!SymbolEqualityComparer.Default.Equals(attr.AttributeClass, attrType))
                     continue;
 
-                // ctor arg: rootNamespace
                 var root =
                     attr.ConstructorArguments.Length > 0
                         ? attr.ConstructorArguments[0].Value as string
@@ -146,7 +143,6 @@ public static class NamespaceComputer
                 if (string.IsNullOrWhiteSpace(root))
                     return null;
 
-                // named arg: Depth property
                 var depth = 0;
                 foreach (var kv in attr.NamedArguments)
                 {
@@ -161,8 +157,8 @@ public static class NamespaceComputer
 
                 if (depth < 0)
                     depth = 0;
-                if (depth > 2)
-                    depth = 2; // you said 0-2 preferred
+                if (depth > 5)
+                    depth = 5;
 
                 return new NamespaceRule(root!, depth);
             }

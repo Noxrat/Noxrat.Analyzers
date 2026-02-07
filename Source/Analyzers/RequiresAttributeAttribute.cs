@@ -2,13 +2,17 @@ using System;
 
 namespace Noxrat.Analyzers;
 
-[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = true, Inherited = false)]
+[AttributeUsage(
+    AttributeTargets.Parameter | AttributeTargets.GenericParameter,
+    AllowMultiple = true,
+    Inherited = false
+)]
 public class RequiresAttributeAttribute : Attribute
 {
-    public string requiredAttribute { get; set; }
+    public Type[] anyOf { get; }
 
-    public RequiresAttributeAttribute(string requiredAttribute)
+    public RequiresAttributeAttribute(params Type[] anyOf)
     {
-        this.requiredAttribute = requiredAttribute;
+        this.anyOf = anyOf;
     }
 }

@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <RootNamespace>Noxrat.Tests</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
@@ -20,6 +21,13 @@
   <ItemGroup>
     <ProjectReference Include="../../Source/Analyzers/Noxrat.Analyzers.csproj" />
     <ProjectReference Include="../../Source/CodeAnalysis/Noxrat.Analyzers.CodeAnalysis.csproj" />
+    <!-- Separately import as an anlyzer to immediately get analyzer bonuses :) -->
+    <ProjectReference
+      Include="../../Source/CodeAnalysis/Noxrat.Analyzers.CodeAnalysis.csproj"
+      OutputItemType="Analyzer"
+      PrivateAssets="none"
+      ExcludeAssets="compile;runtime;native"
+    />
   </ItemGroup>
   <ItemGroup>
     <Using Include="NUnit.Framework" />

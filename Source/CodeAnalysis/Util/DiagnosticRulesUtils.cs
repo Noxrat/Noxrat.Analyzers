@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Noxrat.Analyzers.CodeAnalysis;
+namespace Noxrat.Analyzers;
 
 public static class DiagnosticRulesUtils
 {
@@ -26,10 +26,10 @@ public static class DiagnosticRulesUtils
             id,
             new DiagnosticDescriptor(
                 //
-                id: $"NoxRaven{((int)id):D4}",
+                id: $"Noxrat{((int)id):D4}",
                 title: title,
                 messageFormat: messageFormat,
-                category: "NoxRaven.Sandbox",
+                category: "Noxrat.Analyzer",
                 defaultSeverity: severity,
                 isEnabledByDefault: true
             )
