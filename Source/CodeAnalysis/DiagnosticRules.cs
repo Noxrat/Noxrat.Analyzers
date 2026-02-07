@@ -19,7 +19,7 @@ public static partial class DiagnosticRules
             DiagnosticRulesUtils.MakeUpRule(
                 EDiagnosticId.NAMESPACE_DOES_NOT_MATCH_RULE,
                 "Namespace does not match rule",
-                "File {0} does not match the root namespace rule",
+                "Type {0} has namespace '{1}' but expected '{2}'",
                 DiagnosticSeverity.Warning
             )
         );

@@ -7,13 +7,16 @@
     <PackageId>noxrat.analyzers</PackageId>
     <RepositoryUrl>https://github.com/Noxrat/Noxrat.Analyzers</RepositoryUrl>
     <Company>NOXRAT</Company>
-    <Version>1.0.0</Version>
-    <Nullable>enable</Nullable>
+    <Version>0.0.0</Version>
+    <Description>Additional coding analyzers for C#.</Description>
+    <PackageReadmeFile>../README.md</PackageReadmeFile>
     <!-- props -->
+    <Nullable>enable</Nullable>
     <IsRoslynAnalyzer>true</IsRoslynAnalyzer>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <AnalyzerLanguage>cs</AnalyzerLanguage>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
   <ItemGroup>

@@ -8,8 +8,9 @@ public sealed class RootNamespaceAttribute : Attribute
     public string rootNamespace { get; }
     public int folderTraversalDepth { get; set; }
 
-    public RootNamespaceAttribute(string rootNamespace)
+    public RootNamespaceAttribute(string rootNamespace, int folderTraversalDepth = 0)
     {
         this.rootNamespace = rootNamespace;
+        this.folderTraversalDepth = folderTraversalDepth;
     }
 }

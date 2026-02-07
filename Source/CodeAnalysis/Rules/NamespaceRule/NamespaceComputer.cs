@@ -17,7 +17,10 @@ public static class NamespaceComputer
         AnalyzerConfigOptionsProvider config
     )
     {
-        var root = rule.rootNamespace.Trim('.');
+        var root = (rule.rootNamespace ?? "").Trim().Trim('.');
+        if (string.IsNullOrWhiteSpace(root))
+            return "";
+
         if (rule.depth <= 0 || string.IsNullOrWhiteSpace(filePath))
             return root;
 
@@ -28,7 +31,7 @@ public static class NamespaceComputer
             return root;
 
         var parts = relativeDir
-            .Split(new[] { '/', '\\' }, System.StringSplitOptions.RemoveEmptyEntries)
+            .Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries)
             .Take(rule.depth)
             .Select(MakeValidNamespaceSegment)
             .Where(p => !string.IsNullOrWhiteSpace(p))
@@ -44,19 +47,31 @@ public static class NamespaceComputer
     {
         var global = config.GlobalOptions;
 
+        string? projectDir = null;
+
         if (
             global.TryGetValue("build_property.ProjectDir", out var p1)
             && !string.IsNullOrWhiteSpace(p1)
         )
-            return p1;
-
-        if (
+            projectDir = p1;
+        else if (
             global.TryGetValue("build_property.MSBuildProjectDirectory", out var p2)
             && !string.IsNullOrWhiteSpace(p2)
         )
-            return p2 + Path.DirectorySeparatorChar;
+            projectDir = p2;
 
-        return null;
+        if (string.IsNullOrWhiteSpace(projectDir))
+            return null;
+
+        try
+        {
+            projectDir = Path.GetFullPath(projectDir);
+            return EnsureTrailingSeparator(projectDir);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private static string GetRelativeDirectory(string? projectDir, string filePath)
@@ -67,20 +82,26 @@ public static class NamespaceComputer
             if (string.IsNullOrWhiteSpace(fileDir))
                 return "";
 
-            if (!string.IsNullOrWhiteSpace(projectDir))
-            {
-                // Normalize a bit
-                projectDir = Path.GetFullPath(projectDir);
-                fileDir = Path.GetFullPath(fileDir);
+            // If we can't determine the project root, DO NOT fall back to absolute paths, something must be wrong with set up, so we just skip rule checking.
+            if (string.IsNullOrWhiteSpace(projectDir))
+                return "";
 
-                if (fileDir.StartsWith(projectDir, System.StringComparison.OrdinalIgnoreCase))
-                {
-                    var rel = fileDir.Substring(projectDir.Length);
-                    return rel.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                }
-            }
+            var fullProjectDir = EnsureTrailingSeparator(Path.GetFullPath(projectDir));
+            var fullFileDir = EnsureTrailingSeparator(Path.GetFullPath(fileDir));
 
-            return fileDir;
+            var projectUri = new Uri(fullProjectDir, UriKind.Absolute);
+            var fileUri = new Uri(fullFileDir, UriKind.Absolute);
+
+            // Only compute relative if file is under project dir.
+            if (!projectUri.IsBaseOf(fileUri))
+                return "";
+
+            var relUri = projectUri.MakeRelativeUri(fileUri);
+            var rel = Uri.UnescapeDataString(relUri.ToString());
+
+            // Uri uses '/', normalize to OS separators then trim.
+            rel = rel.Replace('/', Path.DirectorySeparatorChar);
+            return rel.Trim(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
         catch
         {
@@ -88,26 +109,55 @@ public static class NamespaceComputer
         }
     }
 
+    private static string EnsureTrailingSeparator(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return path;
+
+        var sep = Path.DirectorySeparatorChar;
+        var alt = Path.AltDirectorySeparatorChar;
+
+        if (path[path.Length - 1] == sep || path[path.Length - 1] == alt)
+            return path;
+
+        return path + sep;
+    }
+
     private static string MakeValidNamespaceSegment(string raw)
     {
-        var chars = raw.Select(ch => char.IsLetterOrDigit(ch) ? ch : '_').ToArray();
-        var candidate = new string(chars);
-
-        if (string.IsNullOrWhiteSpace(candidate))
+        if (string.IsNullOrWhiteSpace(raw))
             return "";
 
+        // Normalize characters
+        var chars = raw.Select(ch => char.IsLetterOrDigit(ch) || ch == '_' ? ch : '_').ToArray();
+        var candidate = new string(chars);
+
+        if (candidate.Length == 0)
+            return "";
+
+        // Ensure valid start
         if (!SyntaxFacts.IsIdentifierStartCharacter(candidate[0]))
             candidate = "_" + candidate;
 
-        if (!SyntaxFacts.IsValidIdentifier(candidate))
+        // Ensure all parts valid
+        var arr = candidate.ToCharArray();
+        for (int i = 1; i < arr.Length; i++)
         {
-            candidate = new string(
-                candidate
-                    .Select(ch => SyntaxFacts.IsIdentifierPartCharacter(ch) ? ch : '_')
-                    .ToArray()
-            );
-            if (!SyntaxFacts.IsIdentifierStartCharacter(candidate[0]))
-                candidate = "_" + candidate;
+            if (!SyntaxFacts.IsIdentifierPartCharacter(arr[i]))
+                arr[i] = '_';
+        }
+        candidate = new string(arr);
+
+        // Avoid keywords/contextual keywords & ensure validity
+        if (
+            !SyntaxFacts.IsValidIdentifier(candidate)
+            || SyntaxFacts.GetKeywordKind(candidate)
+                != Microsoft.CodeAnalysis.CSharp.SyntaxKind.None
+            || SyntaxFacts.GetContextualKeywordKind(candidate)
+                != Microsoft.CodeAnalysis.CSharp.SyntaxKind.None
+        )
+        {
+            candidate = "_" + candidate;
         }
 
         return candidate;
@@ -144,15 +194,19 @@ public static class NamespaceComputer
                     return null;
 
                 var depth = 0;
+                if (
+                    attr.ConstructorArguments.Length > 1
+                    && attr.ConstructorArguments[1].Value is int dCtor
+                )
+                    depth = dCtor;
+
                 foreach (var kv in attr.NamedArguments)
                 {
-                    if (
-                        string.Equals(kv.Key, "Depth", StringComparison.OrdinalIgnoreCase)
-                        && kv.Value.Value is int d
-                    )
-                    {
-                        depth = d;
-                    }
+                    if (kv.Value.Value is not int dNamed)
+                        continue;
+
+                    if (IsDepthKey(kv.Key))
+                        depth = dNamed;
                 }
 
                 if (depth < 0)
@@ -165,5 +219,10 @@ public static class NamespaceComputer
 
             return null;
         }
+
+        private static bool IsDepthKey(string key) =>
+            string.Equals(key, "folderTraversalDepth", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(key, "FolderTraversalDepth", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(key, "Depth", StringComparison.OrdinalIgnoreCase);
     }
 }
