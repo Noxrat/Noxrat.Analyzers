@@ -17,5 +17,11 @@
       PrivateAssets="none"
       ExcludeAssets="compile;runtime;native"
     />
+    <ProjectReference
+      Include="../../Source/CodeFix/Noxrat.Analyzers.Codefix.csproj"
+      OutputItemType="Analyzer"
+      PrivateAssets="none"
+      ExcludeAssets="compile;runtime;native"
+    />
   </ItemGroup>
 </Project>
