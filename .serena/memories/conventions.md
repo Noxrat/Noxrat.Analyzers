@@ -16,3 +16,11 @@
   - Enforced at call sites (invocation/object creation), not declarations.
   - Supports OR within one attribute instance; AND across multiple attribute instances.
   - Unwraps arrays/nullable before attribute checks; traverses inheritance chain for matching.
+- Code guidelines to use in this project:
+  - Any new code inside this project should have file-scoped namespace.
+  - The files should be defined under NoxRaven namespace plus the filter path.
+  For example, Sandbox->Navigation->Detour should have namespace Noxraven.Navigation.Detour
+  - Any private variables should have `_variableName`, eg `private string _test`
+  - Any public variables should have `variableName`, eg `public string test`
+  - Any static readonly and const variable should have `VARIABLE_NAME`, eg `public const string TEST`
+  - Any properties should have `VariableName`, eg `public string Test { get; set; }`
