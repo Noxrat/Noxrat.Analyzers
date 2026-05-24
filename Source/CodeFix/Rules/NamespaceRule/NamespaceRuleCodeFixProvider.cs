@@ -2,7 +2,6 @@ using System;
 using System.Collections.Immutable;
 using System.Composition;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
@@ -42,24 +41,22 @@ public sealed class NamespaceRuleCodeFixProvider : CodeFixProvider
         if (namespaceDeclaration is null)
             return;
 
-        var semanticModel = await context
-            .Document.GetSemanticModelAsync(context.CancellationToken)
-            .ConfigureAwait(false);
-        if (semanticModel is null)
+        var tree = namespaceDeclaration.SyntaxTree;
+        if (tree is null)
             return;
 
-        var rule = NamespaceRule.TryCreate(semanticModel.Compilation);
-        if (rule is null)
-            return;
-
-        var expectedNamespace = ComputeExpectedNamespace(
-            rule.Value,
-            context.Document.FilePath ?? string.Empty,
-            context.Document.Project.AnalyzerOptions.AnalyzerConfigOptionsProvider
+        var config = context.Document.Project.AnalyzerOptions.AnalyzerConfigOptionsProvider;
+        var projectDir = TryGetProjectDir(config);
+        var effectiveRule = TryGetEffectiveNamespaceRule(
+            tree,
+            config,
+            projectDir
         );
 
-        if (string.IsNullOrWhiteSpace(expectedNamespace))
+        if (effectiveRule is null)
             return;
+
+        var expectedNamespace = effectiveRule.Value.expectedNamespace;
 
         if (
             string.Equals(
@@ -111,7 +108,7 @@ public sealed class NamespaceRuleCodeFixProvider : CodeFixProvider
         Document document,
         BaseNamespaceDeclarationSyntax namespaceDeclaration,
         string targetNamespace,
-        CancellationToken cancellationToken
+        System.Threading.CancellationToken cancellationToken
     )
     {
         var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);

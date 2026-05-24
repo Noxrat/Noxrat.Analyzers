@@ -1,3 +1,1 @@
-using Noxrat.Analyzers;
-
-[assembly: RootNamespace("Noxrat.Sandbox.Tests", FolderTraversalDepth = 0)]
+// Namespace rule config comes from .editorconfig.

@@ -10,7 +10,7 @@ public static class AnalyzerVerifierHelper
     )
     {
         // yeah
-        var attrAssembly = typeof(Analyzers.RootNamespaceAttribute).Assembly;
+        var attrAssembly = typeof(Analyzers.RequiresAttributeAttribute).Assembly;
         if (string.IsNullOrWhiteSpace(attrAssembly.Location))
             throw new InvalidOperationException(
                 $"Broke reference to Noxrat.Analyzers assembly {attrAssembly.FullName}"
