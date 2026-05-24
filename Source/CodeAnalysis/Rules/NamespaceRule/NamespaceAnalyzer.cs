@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -26,12 +27,16 @@ public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer
 
         context.RegisterCompilationStartAction(startCtx =>
         {
-            var rule = NamespaceRule.TryCreate(startCtx.Compilation);
-            if (rule is null)
-                return;
+            var config = startCtx.Options.AnalyzerConfigOptionsProvider;
+            var projectDir = NamespaceComputer.TryGetProjectDir(config);
+            var cachedEffectiveRules = new ConcurrentDictionary<
+                SyntaxTree,
+                NamespaceComputer.EffectiveNamespaceRule?
+            >();
 
             startCtx.RegisterSymbolAction(
-                symbolCtx => AnalyzeNamedType(symbolCtx, rule.Value, startCtx.Options),
+                symbolCtx =>
+                    AnalyzeNamedType(symbolCtx, config, projectDir, cachedEffectiveRules),
                 SymbolKind.NamedType
             );
         });
@@ -39,8 +44,10 @@ public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeNamedType(
         SymbolAnalysisContext context,
-        NamespaceRule rule,
-        AnalyzerOptions options
+        AnalyzerConfigOptionsProvider config,
+        string? projectDir,
+        ConcurrentDictionary<SyntaxTree, NamespaceComputer.EffectiveNamespaceRule?>
+            cachedEffectiveRules
     )
     {
         if (context.Symbol is not INamedTypeSymbol typeSymbol)
@@ -70,13 +77,16 @@ public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer
             if (tree is null)
                 continue;
 
-            var expected = NamespaceComputer.ComputeExpectedNamespace(
-                rule,
-                tree.FilePath,
-                options.AnalyzerConfigOptionsProvider
+            var effectiveRule = cachedEffectiveRules.GetOrAdd(
+                tree,
+                t => NamespaceComputer.TryGetEffectiveNamespaceRule(t, config, projectDir)
             );
 
+            if (effectiveRule is null)
+                continue;
+
             var actual = typeSymbol.ContainingNamespace.ToDisplayString();
+            var expected = effectiveRule.Value.expectedNamespace;
 
             if (StringComparer.Ordinal.Equals(actual, expected))
                 continue;
