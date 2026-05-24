@@ -1,0 +1,16 @@
+- Restore/build/test:
+  - `dotnet restore Noxrat.Analyzers.sln`
+  - `dotnet build Noxrat.Analyzers.sln -c Debug`
+  - `dotnet build Noxrat.Analyzers.sln -c Release`
+  - `dotnet test Noxrat.Analyzers.sln -c Debug`
+- Focused test runs:
+  - `dotnet test TestProjects/UnitTests/Noxrat.Analyzers.Tests.csproj -c Debug`
+  - `dotnet test TestProjects/LibTests/Noxrat.Analyzers.Sandbox.Tests.csproj -c Debug`
+- Packaging/publish flow:
+  - `dotnet pack Source/Analyzers/Noxrat.Analyzers.csproj -c Release -o artifacts/nuget/_publish`
+  - `python zscripts/publish.py patch <nuget_api_key>`
+  - `python zscripts/publish.py publish-only <nuget_api_key>`
+- Fast search/navigation on Linux:
+  - `rg --files`
+  - `rg -n "<pattern>" Source TestProjects`
+  - `find Source TestProjects -name "*.cs"`

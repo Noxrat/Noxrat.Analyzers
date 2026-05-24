@@ -1,0 +1,19 @@
+- Language: C# (`LangVersion=latest`) with nullable enabled across projects.
+- Target frameworks:
+  - Shipping projects (`Source/Analyzers`, `Source/CodeAnalysis`, `Source/CodeFix`) -> `netstandard2.0`.
+  - Test projects (`TestProjects/*`) -> `net10.0`.
+  - Analyzer test harness uses `ReferenceAssemblies.Net.Net80` for compilation context.
+- Roslyn dependencies:
+  - `Microsoft.CodeAnalysis.Common` 5.0.0
+  - `Microsoft.CodeAnalysis.CSharp` 5.0.0
+  - `Microsoft.CodeAnalysis.CSharp.Workspaces` 5.0.0 (code-fix/test usage)
+  - `Microsoft.CodeAnalysis.Analyzers` 4.14.0 (private assets)
+- Test dependencies:
+  - `Microsoft.CodeAnalysis.*.Testing` 1.1.3
+  - `Microsoft.NET.Test.Sdk` 17.14.0
+  - `NUnit` 4.3.2 + `NUnit3TestAdapter` 5.0.0 + `NUnit.Analyzers` 4.7.0
+  - `coverlet.collector` 6.0.4
+- Packaging/build:
+  - Main package id: `noxrat.analyzers` (MIT).
+  - Analyzer+codefix binaries packed under `analyzers/dotnet/cs/`.
+  - Release/publish automation script: `zscripts/publish.py` (Python, dotnet CLI, nuget push).

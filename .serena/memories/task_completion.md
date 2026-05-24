@@ -1,0 +1,13 @@
+- Minimum done checks for code changes:
+  - `dotnet build Noxrat.Analyzers.sln -c Debug`
+  - `dotnet test Noxrat.Analyzers.sln -c Debug`
+- If analyzer logic changed (`Source/CodeAnalysis`):
+  - Re-run focused unit tests in `TestProjects/UnitTests`.
+  - Verify expected diagnostic IDs/messages still match test assertions.
+- If code-fix logic changed (`Source/CodeFix`):
+  - Ensure code-fix tests pass (`NamespaceRuleTests` includes fix assertion).
+- If package/version/publish files changed:
+  - Build `Release` and pack analyzer project before publish.
+  - Confirm output package in `artifacts/nuget/_publish`.
+- Memory hygiene after onboarding/updates:
+  - Run `serena memories check` from repo root to detect stale `mem:` links.

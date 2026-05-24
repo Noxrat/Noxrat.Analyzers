@@ -1,0 +1,18 @@
+- Namespace layout:
+  - Code uses file-scoped namespaces (`csharp_style_namespace_declarations = file_scoped`).
+  - Project intentionally disables IDE folder/namespace enforcement (`dotnet_style_namespace_match_folder = false`) because custom analyzer handles rule.
+- Diagnostic modeling:
+  - IDs from enum (`EDiagnosticId`) -> descriptor map (`DiagnosticRules`) -> extension accessor (`ExRule`).
+  - Descriptor category string fixed: `Noxrat.Analyzer`.
+- Analyzer style:
+  - Register actions in `CompilationStartAction` when rule prerequisites exist.
+  - Early-return guard style for symbol/type/null checks.
+  - Report diagnostics on declaration-specific locations (partial types handled per syntax tree).
+- Namespace rule specifics:
+  - Root namespace attribute read from assembly metadata.
+  - Folder depth clamped 0..5.
+  - Path sanitization converts invalid identifier chars to `_` and prefixes `_` for keywords/invalid starts.
+- Requires-attribute rule specifics:
+  - Enforced at call sites (invocation/object creation), not declarations.
+  - Supports OR within one attribute instance; AND across multiple attribute instances.
+  - Unwraps arrays/nullable before attribute checks; traverses inheritance chain for matching.

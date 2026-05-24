@@ -1,0 +1,18 @@
+- Purpose: Roslyn analyzer package enforcing namespace + attribute contracts at compile time.
+- Diagnostic IDs:
+  - Noxrat0000 -> namespace mismatch (`EDiagnosticId.NAMESPACE_DOES_NOT_MATCH_RULE`).
+  - Noxrat0001 -> required attribute missing (`EDiagnosticId.REQUIRE_ATTRIBUTE_DOESNT_CONTAIN_ATTRIBUTE`).
+- Source map:
+  - `Source/Analyzers`: consumer-facing attributes (`RootNamespaceAttribute`, `RequiresAttributeAttribute`).
+  - `Source/CodeAnalysis`: analyzer engine (`DiagnosticRules`, `DiagnosticId`, `Util/DiagnosticRulesUtils`, `Rules/*`).
+  - `Source/CodeFix`: namespace fix provider (`NamespaceRuleCodeFixProvider`) for Noxrat0000 only.
+  - `TestProjects/UnitTests`: analyzer/code-fix tests via Microsoft.CodeAnalysis.Testing + NUnit.
+  - `TestProjects/LibTests`: sandbox compile target with deliberate suppressions to validate warnings.
+- Invariants:
+  - Descriptor registry centralized in `DiagnosticRules`; call sites use `EDiagnosticId.ExRule()`.
+  - Analyzer init pattern: disable generated-code analysis + enable concurrency.
+  - Namespace computation clamps traversal depth to 0..5 and uses project-relative path only.
+- Read `mem:tech_stack` for frameworks/packages.
+- Read `mem:suggested_commands` for build/test/publish commands.
+- Read `mem:conventions` for coding + API conventions.
+- Read `mem:task_completion` for done checklist.
