@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Source/">
+    <Project Path="Source/Analyzers/Noxrat.Analyzers.csproj" />
+    <Project Path="Source/CodeAnalysis/Noxrat.Analyzers.CodeAnalysis.csproj" />
+    <Project Path="Source/CodeFix/Noxrat.Analyzers.Codefix.csproj" />
+  </Folder>
+  <Folder Name="/TestProjects/">
+    <Project Path="TestProjects/LibTests/Noxrat.Analyzers.Sandbox.Tests.csproj" />
+    <Project Path="TestProjects/UnitTests/Noxrat.Analyzers.Tests.csproj" />
+  </Folder>
+</Solution>
