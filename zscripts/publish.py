@@ -3,7 +3,7 @@
 #   python zscripts/publish.py <major|minor|patch|publish-only> <api_key>
 #
 # Behavior:
-# - Finds repo root by walking upward until it finds a *.sln
+# - Finds repo root by walking upward until it finds a *.slnx
 # - If major/minor/patch:
 #     - Bumps <Version>x.y.z</Version> in all *.csproj under:
 #         Source/Analyzers, Source/CodeAnalysis, Source/CodeFix
@@ -97,7 +97,7 @@ def find_repo_root() -> Path:
     Walk upward from:
       - current working directory
       - script directory
-    until we find a directory containing at least one *.sln.
+    until we find a directory containing at least one *.slnx.
     """
     starts = [Path.cwd().resolve(), Path(__file__).resolve().parent]
     visited = set()
@@ -109,23 +109,23 @@ def find_repo_root() -> Path:
                 break
             visited.add(p)
 
-            if any(p.glob("*.sln")):
+            if any(p.glob("*.slnx")):
                 return p
 
             if p.parent == p:
                 break
             p = p.parent
 
-    raise RuntimeError("Could not find repo root (a directory containing a *.sln) from cwd or script location.")
+    raise RuntimeError("Could not find repo root (a directory containing a *.slnx) from cwd or script location.")
 
 
 def find_solution_file(root: Path) -> Path:
-    slns = sorted(root.glob("*.sln"))
-    if not slns:
-        raise RuntimeError(f"No .sln found in repo root: {root}")
-    if len(slns) > 1:
-        eprint(f"Warning: multiple .sln files found in {root}. Using: {slns[0].name}")
-    return slns[0]
+    slnxs = sorted(root.glob("*.slnx"))
+    if not slnxs:
+        raise RuntimeError(f"No .slnx found in repo root: {root}")
+    if len(slnxs) > 1:
+        eprint(f"Warning: multiple .slnx files found in {root}. Using: {slnxs[0].name}")
+    return slnxs[0]
 
 
 def find_csproj_files(root: Path) -> List[Path]:
@@ -226,8 +226,8 @@ def clean_publish_output_dir(root: Path) -> Path:
     return out_dir
 
 
-def build_solution(root: Path, sln: Path) -> None:
-    run(["dotnet", "build", str(sln), "-c", "Release"], cwd=root)
+def build_solution(root: Path, slnx: Path) -> None:
+    run(["dotnet", "build", str(slnx), "-c", "Release"], cwd=root)
 
 
 def pack_projects(root: Path, out_dir: Path) -> List[Path]:
@@ -310,10 +310,10 @@ def main(argv: List[str]) -> int:
         return 2
 
     root = find_repo_root()
-    sln = find_solution_file(root)
+    slnx = find_solution_file(root)
 
     print(f"Repo root: {root}")
-    print(f"Solution:  {sln.name}")
+    print(f"Solution:  {slnx.name}")
     print(f"Mode:      {mode}")
 
     changed: List[Path] = []
@@ -326,7 +326,7 @@ def main(argv: List[str]) -> int:
         print("publish-only: leaving versions unchanged; no git operations will be performed.")
 
     # 2) Build solution
-    build_solution(root, sln)
+    build_solution(root, slnx)
 
     # 3) Pack all packable projects under target dirs
     out_dir = clean_publish_output_dir(root)
