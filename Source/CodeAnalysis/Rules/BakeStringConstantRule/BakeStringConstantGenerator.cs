@@ -57,13 +57,16 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
 
             foreach (var expression in listOfFieldExpressions)
             {
-                var symbolInfo = generatorCtx.SemanticModel.GetSymbolInfo(expression, cancellationToken);
+                var symbolInfo = generatorCtx.SemanticModel.GetSymbolInfo(
+                    expression,
+                    cancellationToken
+                );
                 var fieldSymbol =
                     symbolInfo.Symbol as IFieldSymbol
                     ?? (
                         symbolInfo.CandidateSymbols.Length == 1
-                        ? symbolInfo.CandidateSymbols[0] as IFieldSymbol
-                        : null
+                            ? symbolInfo.CandidateSymbols[0] as IFieldSymbol
+                            : null
                     );
 
                 fieldRefs.Add(
@@ -112,7 +115,11 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
     )
     {
         var ctor = attributeData.AttributeConstructor;
-        if (ctor is null || ctor.Parameters.Length == 0 || attributeData.ConstructorArguments.Length == 0)
+        if (
+            ctor is null
+            || ctor.Parameters.Length == 0
+            || attributeData.ConstructorArguments.Length == 0
+        )
             return;
 
         var firstParamName = ctor.Parameters[0].Name;
@@ -142,14 +149,18 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
         AttributeSyntax attributeSyntax
     )
     {
-        if (attributeSyntax.ArgumentList is null || attributeSyntax.ArgumentList.Arguments.Count == 0)
+        if (
+            attributeSyntax.ArgumentList is null
+            || attributeSyntax.ArgumentList.Arguments.Count == 0
+        )
             return ImmutableArray<ExpressionSyntax>.Empty;
 
         var args = attributeSyntax.ArgumentList.Arguments;
         foreach (var arg in args)
         {
             var name =
-                arg.NameColon?.Name.Identifier.ValueText ?? arg.NameEquals?.Name.Identifier.ValueText;
+                arg.NameColon?.Name.Identifier.ValueText
+                ?? arg.NameEquals?.Name.Identifier.ValueText;
             if (!string.Equals(name, "listOfFields", StringComparison.Ordinal))
                 continue;
 
@@ -200,7 +211,9 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
         return -1;
     }
 
-    private static ImmutableArray<ExpressionSyntax> ExpandFieldExpressions(ExpressionSyntax expression)
+    private static ImmutableArray<ExpressionSyntax> ExpandFieldExpressions(
+        ExpressionSyntax expression
+    )
     {
         switch (expression)
         {
@@ -373,8 +386,7 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
                     attr.Format,
                     out var parsedTemplate,
                     out var formatError
-                )
-                || parsedTemplate is null
+                ) || parsedTemplate is null
             )
             {
                 sourceCtx.ReportDiagnostic(
@@ -389,7 +401,11 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
             }
 
             var bakedValue = parsedTemplate.Render(fieldValues);
-            var generatedSource = GenerateClassFragment(target.ClassSymbol, attr.VariableName, bakedValue);
+            var generatedSource = GenerateClassFragment(
+                target.ClassSymbol,
+                attr.VariableName,
+                bakedValue
+            );
             var hintName =
                 $"{SanitizeFileToken(target.ClassSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat))}.{attr.VariableName}.{generatedCount}.g.cs";
             sourceCtx.AddSource(hintName, generatedSource);
@@ -432,7 +448,9 @@ public sealed class BakeStringConstantGenerator : IIncrementalGenerator
 
         if (!classSymbol.ContainingNamespace.IsGlobalNamespace)
         {
-            sb.Append("namespace ").Append(classSymbol.ContainingNamespace.ToDisplayString()).AppendLine(";");
+            sb.Append("namespace ")
+                .Append(classSymbol.ContainingNamespace.ToDisplayString())
+                .AppendLine(";");
             sb.AppendLine();
         }
 

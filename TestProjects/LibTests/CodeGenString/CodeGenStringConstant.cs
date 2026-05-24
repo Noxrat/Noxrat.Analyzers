@@ -2,7 +2,10 @@ using Noxrat.Analyzers;
 
 namespace Noxrat.Sandbox.Tests;
 
-[BakeStringConstant("{field,separator:','}", listOfFields: [KEY1, KEY2, KEY3, CodeGenStringConstantOther.KEY1])]
+[BakeStringConstant(
+    "{field,separator:','}",
+    listOfFields: [KEY1, KEY2, KEY3, CodeGenStringConstantOther.KEY1]
+)]
 public static partial class CodeGenStringConstant
 {
     public const string KEY1 = "spawn_point";

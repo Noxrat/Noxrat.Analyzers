@@ -1,12 +1,12 @@
-﻿using Microsoft;
+﻿using System.IO;
+using Microsoft;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing;
 using Noxrat.Analyzers;
 using Noxrat.Tests.Helpers;
-using System.IO;
 
 namespace Noxrat.Tests;
 
@@ -292,7 +292,10 @@ public class NamespaceRuleTests
 
             foreach (var (path, content) in sources)
             {
-                var fullPath = Path.Combine(testRoot, path.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(
+                    testRoot,
+                    path.Replace('/', Path.DirectorySeparatorChar)
+                );
                 test.TestState.Sources.Add((fullPath, content));
             }
 
@@ -325,13 +328,19 @@ public class NamespaceRuleTests
 
             foreach (var (path, content) in sources)
             {
-                var fullPath = Path.Combine(testRoot, path.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(
+                    testRoot,
+                    path.Replace('/', Path.DirectorySeparatorChar)
+                );
                 test.TestState.Sources.Add((fullPath, content));
             }
 
             foreach (var (path, content) in fixedSources)
             {
-                var fullPath = Path.Combine(testRoot, path.Replace('/', Path.DirectorySeparatorChar));
+                var fullPath = Path.Combine(
+                    testRoot,
+                    path.Replace('/', Path.DirectorySeparatorChar)
+                );
                 test.FixedState.Sources.Add((fullPath, content));
             }
 

@@ -164,10 +164,7 @@ public class BakeStringConstantGeneratorTests
 
         Assert.That(result.Diagnostics.Count(d => d.Id == collisionId), Is.EqualTo(1));
         Assert.That(result.GeneratedSources.Count, Is.EqualTo(1));
-        Assert.That(
-            result.GeneratedSources[0],
-            Does.Contain("public const string DUP = \"one\";")
-        );
+        Assert.That(result.GeneratedSources[0], Does.Contain("public const string DUP = \"one\";"));
     }
 
     [Test]

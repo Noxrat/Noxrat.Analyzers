@@ -29,14 +29,11 @@ public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer
         {
             var config = startCtx.Options.AnalyzerConfigOptionsProvider;
             var projectDir = NamespaceComputer.TryGetProjectDir(config);
-            var cachedEffectiveRules = new ConcurrentDictionary<
-                SyntaxTree,
-                NamespaceComputer.EffectiveNamespaceRule?
-            >();
+            var cachedEffectiveRules =
+                new ConcurrentDictionary<SyntaxTree, NamespaceComputer.EffectiveNamespaceRule?>();
 
             startCtx.RegisterSymbolAction(
-                symbolCtx =>
-                    AnalyzeNamedType(symbolCtx, config, projectDir, cachedEffectiveRules),
+                symbolCtx => AnalyzeNamedType(symbolCtx, config, projectDir, cachedEffectiveRules),
                 SymbolKind.NamedType
             );
         });
@@ -46,8 +43,10 @@ public sealed class NamespaceRuleAnalyzer : DiagnosticAnalyzer
         SymbolAnalysisContext context,
         AnalyzerConfigOptionsProvider config,
         string? projectDir,
-        ConcurrentDictionary<SyntaxTree, NamespaceComputer.EffectiveNamespaceRule?>
-            cachedEffectiveRules
+        ConcurrentDictionary<
+            SyntaxTree,
+            NamespaceComputer.EffectiveNamespaceRule?
+        > cachedEffectiveRules
     )
     {
         if (context.Symbol is not INamedTypeSymbol typeSymbol)

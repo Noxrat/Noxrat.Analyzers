@@ -241,7 +241,9 @@ public sealed class CodegenFormatTemplate
             cursor++;
             SkipWhitespace(tokenBody, ref cursor);
 
-            if (!TryReadOptionValue(tokenBody, ref cursor, out var optionValue, out var optionError))
+            if (
+                !TryReadOptionValue(tokenBody, ref cursor, out var optionValue, out var optionError)
+            )
             {
                 error = $"{optionError} (token starts at index {tokenStartIndexInFormat}).";
                 return false;
@@ -431,7 +433,13 @@ public sealed class CodegenFormatTemplate
 
         public static TemplateSegment Literal(string value)
         {
-            return new TemplateSegment(SegmentKind.Literal, value, string.Empty, string.Empty, string.Empty);
+            return new TemplateSegment(
+                SegmentKind.Literal,
+                value,
+                string.Empty,
+                string.Empty,
+                string.Empty
+            );
         }
 
         public static TemplateSegment Field(string separator, string prefix, string suffix)

@@ -77,7 +77,10 @@ public static class NamespaceComputer
 
         if (
             depth <= 0
-            && (string.IsNullOrWhiteSpace(scopeDir) || string.Equals(scopeDir, ".", StringComparison.Ordinal))
+            && (
+                string.IsNullOrWhiteSpace(scopeDir)
+                || string.Equals(scopeDir, ".", StringComparison.Ordinal)
+            )
         )
         {
             return new EffectiveNamespaceRule(rootNamespace);
