@@ -1,3 +1,3 @@
 using Noxrat.Analyzers;
 
-[assembly: RootNamespace("Noxrat.Tests", folderTraversalDepth = 1)]
+[assembly: RootNamespace("Noxrat.Tests", FolderTraversalDepth = 1)]
